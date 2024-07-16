@@ -1,0 +1,15 @@
+fastapi
+typing
+uvicorn
+pydantic
+pillow
+tensorflow
+pytest
+httpx
+static
+python-multipart
+pyjwt
+passlib[bcrypt]
+python-jose
+simplejson
+torchvision
