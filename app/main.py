@@ -48,7 +48,7 @@ fake_users_db = {
 
 model = load_model()
 model_loaded = load_model_f(model_path="resnet50_binary_classification.pth")
-
+model_breast_cancer=load_model_f(model_path="resnet50_breast_cancer_classification.pth")
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -179,6 +179,26 @@ file: UploadFile = File(...)):
         })
     except Exception as e:
         logger.error(f"Error in /predict endpoint: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+@app.post("/Malignant breast cancer detection", response_model=Predictiona)
+async def prediction(current_user: Annotated[User, Depends(get_current_user)],
+file: UploadFile = File(...)):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File provided is not an image.")
+
+    try:
+        image_bytes = await file.read()
+        prediction_score = predict_image(image_bytes, model_loaded)
+        predicted_class = "True" if prediction_score > 0.5 else "False"
+
+        return JSONResponse(content={
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "prediction": prediction_score,
+            "Is the breast cancer Malignant ?": predicted_class
+        })
+    except Exception as e:
+        logger.error(f"Error in /Breast cancer classification endpoint: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
